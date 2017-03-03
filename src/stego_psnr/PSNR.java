@@ -69,6 +69,7 @@ public class PSNR {
                 }
             }
         }
+        
         mse = mse / (width * height);
         System.out.println("MSE:" + mse);
         
@@ -76,7 +77,7 @@ public class PSNR {
         System.out.println("PSNR 255:" + psnr_255);
         
         psnr_peak = (float) (10 * (Math.log10(Math.pow(peak, 2) / mse)));
-        System.out.println("PSNR Peak:" + psnr_peak);
+        System.out.println("PSNR Peak :" + psnr_peak);
         
         return psnr_peak;
         

@@ -1,12 +1,15 @@
 package servlet;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -116,14 +119,6 @@ public class LSB_Encode extends HttpServlet {
 			// Obtain image from image icon
 			Image encodedImage_image = encodedImage_imageIcon.getImage(); // Get the image
 			
-//			byte[] encodedImage_byte = LSB.encode(inputImage_part.getInputStream(), inputFile_string);
-//			
-//			// Obtain an image icon
-//			ImageIcon encodedImage_imageIcon = new ImageIcon(encodedImage_byte);
-//						
-//			// Obtain image from image icon
-//			Image encodedImage_image = encodedImage_imageIcon.getImage(); // Get the image
-			
 		// PSNR
 			
 			PSNR psnr = new PSNR(encodedImage_image, inputImage_image);
@@ -132,8 +127,8 @@ public class LSB_Encode extends HttpServlet {
 			
 		// CLOSE RESPONSE
 			
-			out.write(encodedImage_stream.toByteArray());
-		
+			ImageIO.write(toBufferedImage(encodedImage_image), "jpg", out);
+
 			try {
 				out.close();
 			} catch(IOException e) {
@@ -161,6 +156,25 @@ public class LSB_Encode extends HttpServlet {
 		}
 
 		return null;
+
+	}
+	
+	public static BufferedImage toBufferedImage(Image img) {
+
+		if (img instanceof BufferedImage) {
+			return (BufferedImage) img;
+		}
+
+		// Create a buffered image with transparency
+		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+
+		// Draw the image on to the buffered image
+		Graphics2D bGr = bimage.createGraphics();
+		bGr.drawImage(img, 0, 0, null);
+		bGr.dispose();
+
+		// Return the buffered image
+		return bimage;
 
 	}
 

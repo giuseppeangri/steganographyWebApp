@@ -14,7 +14,11 @@ public class PSNR {
 	private int width;
 	private int height;
 	
-	public PSNR(Image image01, Image image02) {
+	private float psnr_255, psnr_peak;
+    private float mse;
+    private double peak;
+	
+	public PSNR(Image image01, Image image02) throws IOException {
 		
 		this.image01 = image01;
 		this.image02 = image02;
@@ -24,40 +28,17 @@ public class PSNR {
 		this.width = icon.getIconWidth();
         this.height = icon.getIconHeight();
         
+        calculate();
+        
 	}
 	
-	public Image getImage01() {
-		return image01;
-	}
-
-	public void setImage01(Image image01) {
-		this.image01 = image01;
-	}
-
-	public Image getImage02() {
-		return image02;
-	}
-
-	public void setImage02(Image image02) {
-		this.image02 = image02;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public float getPSNR() throws IOException {
+	private void calculate() throws IOException {
 		
 		int[][] image01_pixels = this.conver2Pixels(image01);
 		int[][] image02_pixels = this.conver2Pixels(image02);
 		
-        float psnr_255, psnr_peak;
-        float mse = 0;
-        double peak = 0;
+        mse = 0;
+        peak = 0;
         
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -71,16 +52,11 @@ public class PSNR {
         }
         
         mse = mse / (width * height);
-        System.out.println("MSE:" + mse);
         
         psnr_255 = (float) (10 * (Math.log10(Math.pow(255, 2) / mse)));
-        System.out.println("PSNR 255:" + psnr_255);
         
         psnr_peak = (float) (10 * (Math.log10(Math.pow(peak, 2) / mse)));
-        System.out.println("PSNR Peak :" + psnr_peak);
-        
-        return psnr_peak;
-        
+                
     }
 	
 	private int[][] conver2Pixels(Image image) throws IOException {
@@ -103,5 +79,29 @@ public class PSNR {
         
         return  pixelMap;
     }
+
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public float getPsnr_255() {
+		return psnr_255;
+	}
+
+	public float getPsnr_peak() {
+		return psnr_peak;
+	}
+
+	public float getMse() {
+		return mse;
+	}
+
+	public double getPeak() {
+		return peak;
+	}
 	
 }

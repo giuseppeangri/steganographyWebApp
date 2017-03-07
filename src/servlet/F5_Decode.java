@@ -75,10 +75,10 @@ public class F5_Decode extends HttpServlet {
 			
 			// Convert inputstream to byte[]
 			inputImage_stream.readFully(input_image);
-
+			
 		// INPUT PASSWORD
 		
-			String password = "abc123";	
+			String password = "abc";	
 		
 		// DECODE
 		
@@ -122,6 +122,12 @@ public class F5_Decode extends HttpServlet {
 		    extractedFileLength &= 0x007fffff;
 		    availableExtractedBits = 0;
 		    if (n>0) {
+		    	
+		    	// NO CONTENT
+		    	
+		    	response.setHeader("ERROR", "Invalid Password or Invalid Image.");
+				response.sendError(401);
+		    	
 				int startOfN = i;
 				int hash;
 extractingLoop:

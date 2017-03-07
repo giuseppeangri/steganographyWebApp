@@ -1,17 +1,13 @@
 package servlet;
 
 
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -100,7 +96,7 @@ public class F5_Encode extends HttpServlet {
 		// ENCODE
 			
 			ByteArrayOutputStream encodedImage_stream = new ByteArrayOutputStream();
-			
+						
 			jpg = new JpegEncoder(inputImage_image, quality, encodedImage_stream, comment);
 			
 			jpg.Compress(inputFile_stream, password);
@@ -117,12 +113,22 @@ public class F5_Encode extends HttpServlet {
 			
 			PSNR psnr = new PSNR(encodedImage_image, inputImage_image);
 			
-			float psnr_value = psnr.getPSNR();
+			response.setHeader("PSNR_255", String.valueOf(psnr.getPsnr_255()));
+			
+			response.setHeader("PSNR_PEAK", String.valueOf(psnr.getPsnr_peak()));
+			
+			response.setHeader("PEAK", String.valueOf(psnr.getPeak()));
+			
+			response.setHeader("MSE", String.valueOf(psnr.getMse()));
+			
+			response.setHeader("IMAGE_WIDTH", String.valueOf(psnr.getWidth()));
+			
+			response.setHeader("IMAGE_HEIGHT", String.valueOf(psnr.getHeight()));
 						
 		// CLOSE RESPONSE
 			
-			ImageIO.write(toBufferedImage(encodedImage_image), "jpg", out);
-		
+			out.write(encodedImage_stream.toByteArray());
+					
 			try {
 				out.close();
 			} catch(IOException e) {
@@ -131,23 +137,23 @@ public class F5_Encode extends HttpServlet {
 		
 	}
 	
-	public static BufferedImage toBufferedImage(Image img) {
-
-		if (img instanceof BufferedImage) {
-			return (BufferedImage) img;
-		}
-
-		// Create a buffered image with transparency
-		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
-
-		// Draw the image on to the buffered image
-		Graphics2D bGr = bimage.createGraphics();
-		bGr.drawImage(img, 0, 0, null);
-		bGr.dispose();
-
-		// Return the buffered image
-		return bimage;
-
-	}
+//	public static BufferedImage toBufferedImage(Image img) {
+//
+//		if (img instanceof BufferedImage) {
+//			return (BufferedImage) img;
+//		}
+//
+//		// Create a buffered image with transparency
+//		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+//
+//		// Draw the image on to the buffered image
+//		Graphics2D bGr = bimage.createGraphics();
+//		bGr.drawImage(img, 0, 0, null);
+//		bGr.dispose();
+//
+//		// Return the buffered image
+//		return bimage;
+//
+//	}
 
 }

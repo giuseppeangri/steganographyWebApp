@@ -91,7 +91,7 @@ public class F5_Encode extends HttpServlet {
 
 		// INPUT PASSWORD
 		
-			String password = "abc123";	
+			String password = "abcd";	
 		
 		// ENCODE
 			

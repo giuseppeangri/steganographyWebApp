@@ -78,7 +78,7 @@ public class F5_Decode extends HttpServlet {
 			
 		// INPUT PASSWORD
 		
-			String password = "abc";	
+			String password = "abcd";
 		
 		// DECODE
 		
@@ -121,13 +121,9 @@ public class F5_Decode extends HttpServlet {
 		    int n = (1 << k)-1;
 		    extractedFileLength &= 0x007fffff;
 		    availableExtractedBits = 0;
+		    
 		    if (n>0) {
-		    	
-		    	// NO CONTENT
-		    	
-		    	response.setHeader("ERROR", "Invalid Password or Invalid Image.");
-				response.sendError(401);
-		    	
+		    			    	
 				int startOfN = i;
 				int hash;
 extractingLoop:
@@ -165,13 +161,20 @@ extractingLoop:
 						    availableExtractedBits=0;
 						    nBytesExtracted++;
 						    // check for pending end of embedded data
-						    if (nBytesExtracted==extractedFileLength)
-								break extractingLoop;
+						    if (nBytesExtracted==extractedFileLength) {
+						    	break extractingLoop;
+						    }
 						}
 				    }
-				    
+				
 				} 
 				while(true);
+			
+				if (nBytesExtracted!=extractedFileLength) {
+			    	response.setHeader("ERROR", "Invalid Password or Invalid Image.");
+					response.sendError(401);
+			    }
+				
 		    } 
 		    else {
 			    
@@ -198,7 +201,7 @@ extractingLoop:
 				}
 				
 		    }
-			
+		
 		// CLOSE RESPONSE
 		
 			try {

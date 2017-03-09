@@ -76,9 +76,9 @@ public class F5_Decode extends HttpServlet {
 			// Convert inputstream to byte[]
 			inputImage_stream.readFully(input_image);
 			
-		// INPUT PASSWORD
+		// INPUT KEY
 		
-			String password = "abcd";
+			String key = request.getParameter("key");
 		
 		// DECODE
 		
@@ -86,7 +86,7 @@ public class F5_Decode extends HttpServlet {
 			
 			coeff = hd.decode();
 			
-			F5Random random = new F5Random(password.getBytes());
+			F5Random random = new F5Random(key.getBytes());
 			
 			Permutation permutation = new Permutation(coeff.length, random);
 			

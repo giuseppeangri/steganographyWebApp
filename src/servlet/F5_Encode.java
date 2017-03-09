@@ -1,13 +1,17 @@
 package servlet;
 
 
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.swing.ImageIcon;
 
+import stego_f5.Bmp;
 import stego_f5.JpegEncoder;
 import stego_psnr.PSNR;
 
@@ -66,6 +71,19 @@ public class F5_Encode extends HttpServlet {
 			// Get part size
 			int inputImage_partSize = (int) inputImage_part.getSize();
 			
+//			BMP
+			
+//			// Get inputstream from part
+//			BufferedInputStream inputImage_stream = new BufferedInputStream(inputImage_part.getInputStream());
+//			
+//			// Bmp encoder
+//			Bmp inputImage_bmp = new Bmp(inputImage_stream);
+//			
+//			// Obtain image
+//			Image inputImage_image = inputImage_bmp.getImage();
+			
+//			JPEG
+			
 			// Get inputstream from part
 			DataInputStream inputImage_stream = new DataInputStream(inputImage_part.getInputStream());
 			
@@ -89,17 +107,17 @@ public class F5_Encode extends HttpServlet {
 			// Get inputstream from part
 			InputStream inputFile_stream = inputFile_part.getInputStream();
 
-		// INPUT PASSWORD
-		
-			String password = "abcd";	
-		
+		// INPUT KEY
+			
+			String key = request.getParameter("key");
+				
 		// ENCODE
 			
 			ByteArrayOutputStream encodedImage_stream = new ByteArrayOutputStream();
 						
 			jpg = new JpegEncoder(inputImage_image, quality, encodedImage_stream, comment);
 			
-			jpg.Compress(inputFile_stream, password);
+			jpg.Compress(inputFile_stream, key);
 			
 			encodedImage_stream.close();
 			
@@ -107,11 +125,23 @@ public class F5_Encode extends HttpServlet {
 			ImageIcon encodedImage_imageIcon = new ImageIcon(encodedImage_stream.toByteArray());
 			
 			// Obtain image from image icon
-			Image encodedImage_image = encodedImage_imageIcon.getImage(); // Get the image
+			Image encodedImage_image_jpg = encodedImage_imageIcon.getImage(); // Get the image
+			
+//			ByteArrayOutputStream encodedImage_stream_png = new ByteArrayOutputStream();
+//			
+//			ImageIO.write(toBufferedImage(encodedImage_image_jpg), "png", encodedImage_stream_png);
+//			
+//			encodedImage_stream_png.close();
+//			
+//			// Obtain an image icon
+//			ImageIcon encodedImage_imageIcon_png = new ImageIcon(encodedImage_stream_png.toByteArray());
+//			
+//			// Obtain image from image icon
+//			Image encodedImage_image_png = encodedImage_imageIcon_png.getImage(); // Get the image
 			
 		// PSNR
 			
-			PSNR psnr = new PSNR(encodedImage_image, inputImage_image);
+			PSNR psnr = new PSNR(encodedImage_image_jpg, inputImage_image);
 			
 			response.setHeader("PSNR_255", String.valueOf(psnr.getPsnr_255()));
 			
@@ -127,6 +157,8 @@ public class F5_Encode extends HttpServlet {
 						
 		// CLOSE RESPONSE
 			
+//			ImageIO.write(toBufferedImage(encodedImage_image_jpg), "png", out);
+			
 			out.write(encodedImage_stream.toByteArray());
 					
 			try {
@@ -137,23 +169,23 @@ public class F5_Encode extends HttpServlet {
 		
 	}
 	
-//	public static BufferedImage toBufferedImage(Image img) {
-//
-//		if (img instanceof BufferedImage) {
-//			return (BufferedImage) img;
-//		}
-//
-//		// Create a buffered image with transparency
-//		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
-//
-//		// Draw the image on to the buffered image
-//		Graphics2D bGr = bimage.createGraphics();
-//		bGr.drawImage(img, 0, 0, null);
-//		bGr.dispose();
-//
-//		// Return the buffered image
-//		return bimage;
-//
-//	}
+	public static BufferedImage toBufferedImage(Image img) {
+
+		if (img instanceof BufferedImage) {
+			return (BufferedImage) img;
+		}
+
+		// Create a buffered image with transparency
+		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+
+		// Draw the image on to the buffered image
+		Graphics2D bGr = bimage.createGraphics();
+		bGr.drawImage(img, 0, 0, null);
+		bGr.dispose();
+
+		// Return the buffered image
+		return bimage;
+
+	}
 
 }

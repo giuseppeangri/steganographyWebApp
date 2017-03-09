@@ -3,6 +3,7 @@ package servlet;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -19,6 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import javax.swing.ImageIcon;
 
+import stego_f5.Bmp;
+import stego_f5.JpegEncoder;
 import stego_lsb.LSB;
 import stego_psnr.PSNR;
 
@@ -61,6 +64,19 @@ public class LSB_Encode extends HttpServlet {
 			// Get part size
 			int inputImage_partSize = (int) inputImage_part.getSize();
 			
+//			BMP
+			
+//			// Get inputstream from part
+//			BufferedInputStream inputImage_stream = new BufferedInputStream(inputImage_part.getInputStream());
+//			
+//			// Bmp encoder
+//			Bmp inputImage_bmp = new Bmp(inputImage_stream);
+//			
+//			// Obtain image
+//			Image inputImage_image = inputImage_bmp.getImage();
+			
+//			JPEG
+			
 			// Get inputstream from part
 			DataInputStream inputImage_stream = new DataInputStream(inputImage_part.getInputStream());
 			
@@ -88,40 +104,70 @@ public class LSB_Encode extends HttpServlet {
 
 			String inputFile_string = streamToString(inputFile_stream);
 		
-		// INPUT PASSWORD
+		// INPUT KEY
 			
-			String password = "abc12345";
+			String key = request.getParameter("key");
 			
 		// ENCODE
 				
-			Image encodedImage_image = null;
+			Image encodedImage_image_png = null;
 			try {
 				LSB lsb = new LSB(inputImage_image);
-				encodedImage_image = lsb.encode(inputFile_string, password);
+				encodedImage_image_png = lsb.encode(inputFile_string, key);
 			} catch (Exception e1) {
 				response.setHeader("ERROR", e1.getMessage());
 				response.sendError(500);
 			}
+			
+			JpegEncoder jpg;
+
+			int quality = 100;
+			
+			String comment  = "Stegano Embedder";
+			
+			ByteArrayOutputStream encodedImage_stream = new ByteArrayOutputStream();
+			
+			jpg = new JpegEncoder(encodedImage_image_png, quality, encodedImage_stream, comment);
+			
+			jpg.Compress();
+			
+			encodedImage_stream.close();
+			
+			// Obtain an image icon
+			ImageIcon encodedImage_imageIcon = new ImageIcon(encodedImage_stream.toByteArray());
+			
+			// Obtain image from image icon
+			Image encodedImage_image_jpg = encodedImage_imageIcon.getImage(); // Get the image
 												
 		// PSNR
 			
-			PSNR psnr = new PSNR(encodedImage_image, inputImage_image);
+			PSNR psnr_png = new PSNR(encodedImage_image_png, inputImage_image);
+			
+			PSNR psnr_jpg = new PSNR(encodedImage_image_jpg, inputImage_image);
 						
-			response.setHeader("PSNR_255", String.valueOf(psnr.getPsnr_255()));
+			response.setHeader("PNG_PSNR_255", String.valueOf(psnr_png.getPsnr_255()));
 			
-			response.setHeader("PSNR_PEAK", String.valueOf(psnr.getPsnr_peak()));
+			response.setHeader("PNG_PSNR_PEAK", String.valueOf(psnr_png.getPsnr_peak()));
 			
-			response.setHeader("PEAK", String.valueOf(psnr.getPeak()));
+			response.setHeader("PNG_PEAK", String.valueOf(psnr_png.getPeak()));
 			
-			response.setHeader("MSE", String.valueOf(psnr.getMse()));
+			response.setHeader("PNG_MSE", String.valueOf(psnr_png.getMse()));
 			
-			response.setHeader("IMAGE_WIDTH", String.valueOf(psnr.getWidth()));
+			response.setHeader("JPG_PSNR_255", String.valueOf(psnr_jpg.getPsnr_255()));
 			
-			response.setHeader("IMAGE_HEIGHT", String.valueOf(psnr.getHeight()));
+			response.setHeader("JPG_PSNR_PEAK", String.valueOf(psnr_jpg.getPsnr_peak()));
+			
+			response.setHeader("JPG_PEAK", String.valueOf(psnr_jpg.getPeak()));
+			
+			response.setHeader("JPG_MSE", String.valueOf(psnr_jpg.getMse()));
+			
+			response.setHeader("IMAGE_WIDTH", String.valueOf(psnr_png.getWidth()));
+			
+			response.setHeader("IMAGE_HEIGHT", String.valueOf(psnr_png.getHeight()));
 			
 		// CLOSE RESPONSE
 			
-			ImageIO.write(toBufferedImage(encodedImage_image), "png", out);
+			ImageIO.write(toBufferedImage(encodedImage_image_png), "png", out);
 			
 			try {
 				out.close();

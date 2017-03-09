@@ -6,13 +6,14 @@ import java.io.*;
 import java.awt.image.MemoryImageSource;
 
 public class Bmp {
+	
     int iDataOffset;
     int pixel[]=null;
     BufferedInputStream imageFile;
 
-    public Bmp(String fileName) {
+    public Bmp(BufferedInputStream inputImage_stream) {
 	try {
-	    imageFile = new BufferedInputStream(new FileInputStream(fileName));
+	    imageFile = inputImage_stream;
 	    readBitmapFileHeader();
 	    readBitmapInfoHeader();
 	    pixel=new int[biWidth*biHeight];

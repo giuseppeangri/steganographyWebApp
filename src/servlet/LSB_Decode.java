@@ -56,9 +56,9 @@ public class LSB_Decode extends HttpServlet {
 			
 			Image inputImage_image = ImageIO.read(inputImage_part.getInputStream());
 
-		// INPUT PASSWORD
+		// INPUT KEY
 		
-			String password = "abc12345";	
+			String key = request.getParameter("key");
 		
 		// DECODE
 			
@@ -71,7 +71,7 @@ public class LSB_Decode extends HttpServlet {
 			}
 			
 			try {
-				String embedText = lsb.decode(password);
+				String embedText = lsb.decode(key);
 				out.write(embedText.getBytes());
 			} catch (Exception e1) {
 				response.setHeader("ERROR", e1.getMessage());

@@ -18,6 +18,8 @@
 			<input type="file" name="image" />
 			<h4>Embed</h4>
 			<input type="file" name="embed" />
+			<h4>Key</h4>
+			<input type="text" name="key" />
 			<br/>
 			<br/>
 			<input type="submit" />
@@ -28,6 +30,8 @@
 		<form name="formname" action="api/f5/decode" method="post" enctype="multipart/form-data" style="padding-left: 5%;">
 			<h4>Image</h4>
 			<input type="file" name="image" />
+			<h4>Key</h4>
+			<input type="text" name="key" />
 			<br/>
 			<br/>
 			<input type="submit" />
@@ -39,6 +43,8 @@
 			<input type="file" name="image" />
 			<h4>Embed</h4>
 			<input type="file" name="embed" />
+			<h4>Key</h4>
+			<input type="text" name="key" />
 			<br/>
 			<br/>
 			<input type="submit" />
@@ -48,6 +54,8 @@
 		<form name="formname" action="api/lsb/decode" method="post" enctype="multipart/form-data" style="padding-left: 5%;">
 			<h4>Image</h4>
 			<input type="file" name="image" />
+			<h4>Key</h4>
+			<input type="text" name="key" />
 			<br/>
 			<br/>
 			<input type="submit" />

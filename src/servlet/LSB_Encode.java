@@ -47,6 +47,8 @@ public class LSB_Encode extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		OutputStream out = response.getOutputStream();
+		
+		Image inputImage_image = null;
   				
 		// SET RESPONSE TYPE
 					
@@ -64,33 +66,48 @@ public class LSB_Encode extends HttpServlet {
 			// Get part size
 			int inputImage_partSize = (int) inputImage_part.getSize();
 			
-//			BMP
-			
-//			// Get inputstream from part
-//			BufferedInputStream inputImage_stream = new BufferedInputStream(inputImage_part.getInputStream());
-//			
-//			// Bmp encoder
-//			Bmp inputImage_bmp = new Bmp(inputImage_stream);
-//			
-//			// Obtain image
-//			Image inputImage_image = inputImage_bmp.getImage();
-			
-//			JPEG
-			
-			// Get inputstream from part
-			DataInputStream inputImage_stream = new DataInputStream(inputImage_part.getInputStream());
-			
-			// Input image as byte[]
-			byte[] inputImage_byte = new byte[inputImage_partSize];
-						
-			// Convert inputstream to byte[]
-			inputImage_stream.readFully(inputImage_byte);
-						
-			// Obtain an image icon
-			ImageIcon inputImage_imageIcon = new ImageIcon(inputImage_byte);
-									
-			// Obtain image from image icon
-			Image inputImage_image = inputImage_imageIcon.getImage(); // Get the image
+			// Get Content Type
+			String inputImage_contentType = inputImage_part.getContentType();
+			String inputImage_type = inputImage_contentType.substring(inputImage_contentType.lastIndexOf("/")+1);
+
+			if(inputImage_type.equalsIgnoreCase("bmp")) {
+
+//				BMP
+
+				// Get inputstream from part
+				BufferedInputStream inputImage_stream = new BufferedInputStream(inputImage_part.getInputStream());
+
+				// Bmp encoder
+				Bmp inputImage_bmp = new Bmp(inputImage_stream);
+
+				// Obtain image
+				inputImage_image = inputImage_bmp.getImage();
+
+			}
+			else if(inputImage_type.equalsIgnoreCase("jpeg")) {
+
+//				JPEG
+
+				// Get inputstream from part
+				DataInputStream inputImage_stream = new DataInputStream(inputImage_part.getInputStream());
+
+				// Input image as byte[]
+				byte[] inputImage_byte = new byte[inputImage_partSize];
+
+				// Convert inputstream to byte[]
+				inputImage_stream.readFully(inputImage_byte);
+
+				// Obtain an image icon
+				ImageIcon inputImage_imageIcon = new ImageIcon(inputImage_byte);
+
+				// Obtain image from image icon
+				inputImage_image = inputImage_imageIcon.getImage(); // Get the image
+
+			}
+			else {
+				response.setHeader("ERROR", "The input image is not supported.");
+				response.sendError(500);
+			}
 
 		// INPUT FILE
 		

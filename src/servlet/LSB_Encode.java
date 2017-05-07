@@ -49,6 +49,8 @@ public class LSB_Encode extends HttpServlet {
 		OutputStream out = response.getOutputStream();
 		
 		Image inputImage_image = null;
+		
+		response.setHeader("Access-Control-Allow-Origin", "*");
   				
 		// SET RESPONSE TYPE
 					
@@ -162,13 +164,13 @@ public class LSB_Encode extends HttpServlet {
 			
 			PSNR psnr_jpg = new PSNR(encodedImage_image_jpg, inputImage_image);
 						
-			response.setHeader("PNG_PSNR_255", String.valueOf(psnr_png.getPsnr_255()));
+			response.setHeader("PSNR_255", String.valueOf(psnr_png.getPsnr_255()));
 			
-			response.setHeader("PNG_PSNR_PEAK", String.valueOf(psnr_png.getPsnr_peak()));
+			response.setHeader("PSNR_PEAK", String.valueOf(psnr_png.getPsnr_peak()));
 			
-			response.setHeader("PNG_PEAK", String.valueOf(psnr_png.getPeak()));
+			response.setHeader("PEAK", String.valueOf(psnr_png.getPeak()));
 			
-			response.setHeader("PNG_MSE", String.valueOf(psnr_png.getMse()));
+			response.setHeader("MSE", String.valueOf(psnr_png.getMse()));
 			
 			response.setHeader("JPG_PSNR_255", String.valueOf(psnr_jpg.getPsnr_255()));
 			

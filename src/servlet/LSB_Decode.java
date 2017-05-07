@@ -38,6 +38,8 @@ public class LSB_Decode extends HttpServlet {
 
 		OutputStream out = response.getOutputStream();
 		
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		
 		// SET RESPONSE TYPE
 					
 			response.setContentType("text/plain");

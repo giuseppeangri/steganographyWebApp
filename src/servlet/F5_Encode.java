@@ -57,8 +57,10 @@ public class F5_Encode extends HttpServlet {
 		
 		Image inputImage_image = null;
 		
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		
 		// SET RESPONSE TYPE
-					
+		
 			response.setContentType("image/jpg");	
 		
 		// INPUT IMAGE

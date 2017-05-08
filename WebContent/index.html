@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+
+	<head>
+
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<title>SteganoApp</title>
+		
+		<!--Custom CSS-->
+		<link href="css/style.css" rel="stylesheet">	
+
+		<!--Fonts-->
+		<link href="css/fonts/Baloo Bhaina/baloo-bhaina.css" rel="stylesheet">
+		<link href="css/fonts/Roboto/roboto.css" rel="stylesheet">
+
+		<!--Material Icons-->
+		<link href="css/material-icons/material-icons.css" rel="stylesheet">
+
+		<!--Angular-->
+		<script src="lib/angular-1.6.4/angular.min.js"></script>
+		<script src="lib/angular-1.6.4/angular-route.min.js"></script>
+		<script src="lib/angular-1.6.4/angular-resource.min.js"></script>
+		<script src="lib/alferov-angular-file-saver-bdba5fa/angular-file-saver.bundle.min.js"></script>
+
+	</head>
+
+	<body ng-controller="MainController as MainCtrl">
+
+		<div class="header">
+
+			<span class="title">SteganoApp</span>
+			<span class="description">A Web Application to Hiding Text into Image through F5 or LSB</span>
+
+		</div>
+		
+		<div class="container">
+
+			<div class="element">
+
+				<div class="leftMenu">
+
+					<div class="button" ng-repeat="mode in modes" ng-click="MainCtrl.setMode(mode.name)" ng-class="{'selected': selected.mode=='{{mode.name}}' }">
+						<div class="content">
+							<div class="center">
+								<i class="material-icons">{{mode.icon}}</i>
+								<span>{{mode.name}}</span>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+
+				<div class="rightContent" ng-if="selected.mode=='Encode'">
+
+					<div class="item">
+
+						<div class="label">
+							<span>Cover Image (JPG or BMP)</span>
+						</div>
+
+						<div class="content">
+							<input type="file" onchange="angular.element(this).controller().setFile('coverImage', this.files[0])" />
+						</div>
+
+					</div>
+
+					<div class="item">
+
+						<div class="label">
+							<span>Key (min. 8)</span>
+						</div>
+
+						<div class="content">
+							<input type="password" ng-model="input.key" />
+						</div>
+
+					</div>
+
+					<div class="item" style="margin-top: 4%;">
+
+						<div class="label">
+							<span>Text File (TXT)</span>
+						</div>
+
+						<div class="content">
+							<input type="file" onchange="angular.element(this).controller().setFile('textFile', this.files[0])" />
+						</div>
+
+					</div>
+
+					<div class="item">
+
+						<div class="label">
+							<span>Algorithms</span>
+						</div>
+
+						<div class="content">
+
+							<div class="switch" ng-repeat="(name, algorithm) in algorithms">
+								<div class="title">
+									<span>{{name}}</span>
+									<span class="description">{{algorithm.encodeDescription}}</span>
+								</div>
+
+								<div class="toggle">
+									<input id="{{name}}" class="cmn-toggle cmn-toggle-round" type="checkbox" ng-model="selected.encodeAlgorithms[name]">
+									<label for="{{name}}"></label>
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+				<div class="rightContent" ng-if="selected.mode=='Decode'">
+
+					<div class="item">
+
+						<div class="label">
+							<span>Stegano Image</span>
+						</div>
+
+						<div class="content">
+							<input type="file" onchange="angular.element(this).controller().setFile('steganoImage', this.files[0])" />
+						</div>
+
+					</div>
+
+					<div class="item">
+
+						<div class="label">
+							<span>Key (min. 8)</span>
+						</div>
+
+						<div class="content">
+							<input type="password" ng-model="input.key" />
+						</div>
+
+					</div>
+
+					<div class="item" style="margin-top: 4%;">
+					</div>
+
+					<div class="item" style="margin-top: 4%;">
+
+						<div class="label">
+							<span>Encoding Algorithm</span>
+						</div>
+
+						<div class="content">
+
+							<div class="switch" ng-repeat="(name, algorithm) in algorithms">
+								<div class="title">
+									<span>{{name}}</span>
+									<span class="description">{{algorithm.decodeDescription}}</span>
+								</div>
+
+								<div class="toggle">
+									<input id="{{name}}" class="cmn-toggle cmn-toggle-round" type="checkbox" ng-model="selected.decodeAlgorithm" ng-true-value="'{{name}}'" ng-false-value="">
+									<label for="{{name}}"></label>
+								</div>
+							</div>
+							<span>{{selectedDecodeAlgorithm}}</span>
+						</div>
+
+					</div>
+					
+				</div>
+
+			</div>
+
+			<div class="element bg-transparent">
+
+				<div class="fullWidth center">
+
+					<div class="button" ng-click="MainCtrl.start()">
+						<div class="content">
+							<div class="center">
+								<i class="material-icons">cached</i>
+								<span>Start</span>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+
+			</div>
+
+			<div id="sections" class="element" ng-repeat="section in sections">
+
+				<div class="fullWidth section">
+
+					<div class="title">
+						<span>{{section.title}}</span>
+						<i class="material-icons" ng-if="!section.collapsed" ng-click="MainCtrl.toggleSection(section)">close</i>
+						<i class="material-icons" ng-if="section.collapsed" ng-click="MainCtrl.toggleSection(section)">keyboard_arrow_down</i>
+					</div>
+
+					<div class="data" ng-if="!section.collapsed">
+
+						<div class="loading" ng-if="section.loading">
+							<i class="material-icons">cached</i>
+						</div>
+
+						<div class="error" ng-if="section.error">
+							<i class="material-icons">error</i>
+							<span>{{section.error}}</span>
+						</div>
+
+						<div class="image center" ng-if="section.image">
+							<img data-ng-src="{{section.image.src}}">
+						</div>
+
+						<div class="detail" ng-if="section.info">
+
+							<div class="left">
+								<p ng-if="section.info.width">Width:</p>
+								<p ng-if="section.info.height">Height:</p>
+								<p ng-if="section.info.size">Size:</p>
+								<p ng-if="section.info.mse">MSE:</p>
+								<p ng-if="section.info.peak">Peak Value:</p>
+								<p ng-if="section.info.psnr_peak">PSNR (Peak Value):</p>
+								<p ng-if="section.info.psnr_255">PSNR (255):</p>
+							</div>
+
+							<div class="right">
+								<p ng-if="section.info.width">{{section.info.width}} px</p>
+								<p ng-if="section.info.height">{{section.info.height}} px</p>
+								<p ng-if="section.info.size">{{section.info.size}}</p>
+								<p ng-if="section.info.mse">{{section.info.mse}}</p>
+								<p ng-if="section.info.peak">{{section.info.peak}}</p>
+								<p ng-if="section.info.psnr_peak">{{section.info.psnr_peak}}</p>
+								<p ng-if="section.info.psnr_255">{{section.info.psnr_255}}</p>
+							</div>
+
+						</div>
+
+						<div class="actions center" ng-if="section.image">
+
+							<div class="button" ng-click="MainCtrl.downloadImage(section.image)">
+								<div class="content">
+									<div class="center">
+										<i class="material-icons">file_download</i>
+										<span>Download</span>
+									</div>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="compare center" ng-if="section.compare">
+
+							<div class="table">
+								
+								<div class="row">
+
+									<div class="col">
+
+									</div>
+
+									<div class="col" ng-repeat="s in sections" ng-if="s.info">
+										<span>{{s.algorithm.name}}</span>
+									</div>
+
+								</div>
+
+								<div class="row">
+
+									<div class="col">
+										<span>Size</span>
+									</div>
+
+									<div class="col" ng-repeat="s in sections" ng-if="s.info">
+										<span>{{s.info.size}}</span>
+									</div>
+
+								</div>
+
+								<div class="row">
+
+									<div class="col">
+										<span>MSE</span>
+									</div>
+
+									<div class="col" ng-repeat="s in sections" ng-if="s.info">
+										<span>{{s.info.mse}}</span>
+									</div>
+
+								</div>
+
+								<div class="row">
+
+									<div class="col">
+										<span>Peak Value</span>
+									</div>
+
+									<div class="col" ng-repeat="s in sections" ng-if="s.info">
+										<span>{{s.info.peak}}</span>
+									</div>
+
+								</div>
+
+								<div class="row">
+
+									<div class="col">
+										<span>PSNR (Peak Value)</span>
+									</div>
+
+									<div class="col" ng-repeat="s in sections" ng-if="s.info">
+										<span>{{s.info.psnr_peak}}</span>
+									</div>
+
+								</div>
+
+								<div class="row">
+
+									<div class="col">
+										<span>PSNR (255)</span>
+									</div>
+
+									<div class="col" ng-repeat="s in sections" ng-if="s.info">
+										<span>{{s.info.psnr_255}}</span>
+									</div>
+
+								</div>
+
+								<div class="row">
+
+									<div class="col">
+										<span>Output</span>
+									</div>
+
+									<div class="col" ng-repeat="s in sections" ng-if="s.info">
+										<span>{{s.algorithm.imageExtension}}</span>
+									</div>
+
+								</div>
+
+							</div>
+
+						</div>
+
+						<div class="text" ng-if="section.text">
+
+							<h2>Size: {{section.text.size}}</h2>
+
+							<div class="preview">
+								<span>{{section.text.text}}</span>
+							</div>
+
+						</div>
+
+						<div class="actions center" ng-if="section.text">
+
+							<div class="button" ng-click="MainCtrl.downloadText(section.text)">
+								<div class="content">
+									<div class="center">
+										<i class="material-icons">file_download</i>
+										<span>Download</span>
+									</div>
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class="element">
+			</div>
+		
+		</div>
+
+		<script src="js/app.module.js"></script>
+				
+	</body>
+
+</html>

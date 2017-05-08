@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <filter>
+    <display-name>CorsFilter</display-name>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    <init-param>
+    	<param-name>cors.exposed.headers</param-name>
+    	<param-value>Content-Length, ERROR, IMAGE_WIDTH, IMAGE_HEIGHT, MSE, PEAK, PSNR_PEAK, PSNR_255, PNG_PSNR_255, PNG_PSNR_PEAK, PNG_PEAK, PNG_MSE, JPG_PSNR_255, JPG_PSNR_PEAK, JPG_PEAK, JPG_MSE</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+</web-app>
